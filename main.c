@@ -34,16 +34,6 @@
  
 #include "battalion.h"
 
-/* openAL headers*/
-#ifdef SOUND
-
-    #include <AL/al.h>
-    #include <AL/alut.h>
-    
-    extern ALfloat listenerOri[];
-
-#endif
-
 
 #define ROADFILE "data/road"
 #define TREEFILE "data/tree"
@@ -371,10 +361,6 @@ void goToLowDetail()
 
 void goToMonsterView(int eyeball)
     {
-#ifdef SOUND
-    /* computing the listener position */
-    float xproj, zproj;
-#endif
 
     float x1,y1,z1,x2,y2,z2;
     
@@ -423,35 +409,6 @@ void goToMonsterView(int eyeball)
    	break;
 
 	}
-#ifdef SOUND
- 
-        // xproj = x*cos (angle) + z*sin(angle);
-        // zproj = z*cos(angle) - x sin(angle);
-        
-        /* x=o for simplest computation  */
- 
-        xproj =  z1*sin(-yrot*0.1*DEG_TO_RAD);   //(x=0)
-        zproj =  z1*cos(-yrot*0.1*DEG_TO_RAD);
-        
-        alListener3f(AL_POSITION, xproj, 0, zproj);
-        
-        // vector (x,y,z)
-        // x = x_target - x_position, and so on
-        
-        xproj =  (z2-z1)*sin(-yrot*0.1*DEG_TO_RAD);   //(x=0)
-        zproj =  (z2-z1)*cos(-yrot*0.1*DEG_TO_RAD);
-        
-        
-        listenerOri[0] = xproj;
-        listenerOri[1] = 0;
-        listenerOri[2] = zproj;
-
-        listenerOri[3] = 0;
-        listenerOri[4] = 1;
-        listenerOri[5] = 0;
-        
-        alListenerfv(AL_ORIENTATION, listenerOri);
-#endif 
 
     if (lod >= 2)
 	{
@@ -472,10 +429,6 @@ void goToMonsterView(int eyeball)
 
 void goToArmyView(int eyeball)
     {
-
-#ifdef SOUND
-    float xproj, zproj, sinANG, cosANG;
-#endif
 
     float x1,y1,z1,x2,y2,z2;
     
@@ -532,38 +485,6 @@ void goToArmyView(int eyeball)
         gluLookAt(x1, y1, z1, x2, y2, z2, 0,1,0);
  		break;
 	}
-#ifdef SOUND
-         // xproj = x*cos (angle) + z*sin(angle);
-         // zproj = z*cos(angle) - x*sin(angle); 
-         
-         sinANG = sin(-yrot*0.1*DEG_TO_RAD);
-         cosANG = cos(-yrot*0.1*DEG_TO_RAD);
-         
-         xproj = x1*cosANG + z1*sinANG;
-         zproj = z1*cosANG - z1*sinANG;
-         
-         alListener3f(AL_POSITION, xproj, y1, zproj);
-         
-         // vector (x,y,z) rotation:
-         // x = x_target - x_position, and so on
-        
-         xproj =  (x2-x1)*cosANG + (z2-z1)*sinANG;   //(x=0)
-         zproj =  (z2-z1)*cosANG - (x2-x1)*sinANG;
-        
-        
-         listenerOri[0] = xproj;
-         listenerOri[1] = 0;
-         listenerOri[2] = zproj;
-
-         listenerOri[3] = 0;
-         listenerOri[4] = 1;
-         listenerOri[5] = 0;
-        
-        alListenerfv(AL_ORIENTATION, listenerOri);
-         
-         
-
-#endif 
 
     if (lod >= 2)
 	{
@@ -593,18 +514,6 @@ void goToMapView()
     glMatrixMode(GL_MODELVIEW);
 	
     gluLookAt(0, mapHeight, 0, 0, PLANEY, 0,  0, 0, 1);
- #ifdef SOUND
-        listenerOri[0] = 0;
-        listenerOri[1] = PLANEY-mapHeight;
-        listenerOri[2] = 0;
-        
-        listenerOri[3] = 0;
-        listenerOri[4] = 0;
-        listenerOri[5] = 1;
-        
-        alListener3f(AL_POSITION, 0.0, mapHeight, 0.0);
-        alListenerfv(AL_ORIENTATION, listenerOri);
-#endif 
     xrot = yrot = 0;
  }
 
@@ -639,29 +548,6 @@ void goToOverView(int eyeball)
    		break;
 	}
 	
-#ifdef SOUND
-        // vector (x,y,z)
-        // x = x_target - x_position, and so on
-        
-        // xproj = x*cos (angle) + z*sin(angle);
-        // zproj = z*cos(angle) - x sin(angle);
-        
-        /* yrot->degrees, sin->rad */
-        
-        xproj =  9*sin(-yrot*0.1*DEG_TO_RAD);   //(x=0)
-        zproj =  9*cos(-yrot*0.1*DEG_TO_RAD);
-        
-        listenerOri[0] = -xproj;
-        listenerOri[1] = 0;
-        listenerOri[2] = -zproj;
-
-        listenerOri[3] = 0;
-        listenerOri[4] = 1;
-        listenerOri[5] = 0;
-        
-        alListener3f(AL_POSITION, xproj, 0, zproj);
-        alListenerfv(AL_ORIENTATION, listenerOri);
-#endif 
 
     if (lod >= 2)
 	{
@@ -771,14 +657,6 @@ void loadLevel(int level)
 
     targets = (struct targetInfo *) malloc(sizeof(struct targetInfo));
     targets->next = NULL;
-
-#ifdef SOUND
-    stopAllSounds();
-    if(mode == DEMOMODE)
-        playMusic(DEMO_MUSIC, AL_TRUE);
-    else
-        playMusic(PLAY_MUSIC, AL_TRUE);
-#endif
 
     unitHill.type	    = 3;
     unitHill.y		    = PLANEY;
@@ -1161,14 +1039,6 @@ void initialization()
     
     alone	    = 0;
  
- #ifdef SOUND
- 
-    noSound	    = 0;
-    turnSoundOn();
-    turnMusicOn();
- 
- #endif
- 
     no3D	    = 0;
     mode3D	    = 0;
     doBigClear	    = 0;
@@ -1191,11 +1061,6 @@ void initialization()
     timePaused	    = 0;
     time3d	    = 0;
     
-#ifdef SOUND
-    timeSound	    = 0;
-    timeMusic	    = 0;
-#endif
-
     timeDetail	    = 0;
     
     mapHeight	    = 35;
@@ -1212,9 +1077,6 @@ void initialization()
 
     roadSystem	    = NULL;
 
-#ifdef SOUND
-    initSound();
-#endif
     /************************************/
     /* get the current date/time        */
     /************************************/
@@ -1452,11 +1314,6 @@ void initialization()
 
     Googelon.monster = rand() % 4;
     
-#ifdef SOUND
-
-    Googelon.source= getPlayersSource();
-#endif
-
 }
 
 
@@ -1724,14 +1581,8 @@ textLineWidth = 1.01;
 		if (Googelon.moveCount < 150)
 		    showScores(itsChristmas, G, V, T, F, Googelon, mainCounter, offsetX, lod);
 		else
-
-#ifdef SOUND
-		    showText2((long) (viewR-viewL), getSoundOn(), noSound, getMusicOn(),
-			    mode3D, no3D, lod, paused, itsChristmas, pointerGrab);
-#else    
 		    showText2((long) (viewR-viewL), 0, noSound, 0,
 			    mode3D, no3D, lod, paused, itsChristmas, pointerGrab);
-#endif	    
 	    showText3(lod);
 
 	    if (showOptions)
@@ -2529,10 +2380,6 @@ void addNewTank(struct targetInfo * targets, float startx, float startz, int sta
     struct tank * temptank,  *ttank;
     struct tree * temptree;
         
-#ifdef SOUND
-
-    ALfloat tankpos[3];
-#endif
     /*********************************/
     /* decide on type of vehicle     */
     /*********************************/
@@ -2846,9 +2693,6 @@ if ((!netUp) || (newtype == MASERTANK))
 		default:	showError("Bogus Vehicle Type! (addNewTank)");
 				break;
 		}
-#ifdef SOUND
-		temptank->source = 0;
-#endif
 	    temptank->next = tanklist->next;
 	    tanklist->next = temptank;
 	    }
@@ -3176,21 +3020,9 @@ void updatetrees(struct tree * allTrees, int itsChristmas)
 		{
 		  temptree->deathCount += 1;
 		  
-#ifdef SOUND
-          if (temptree->deathCount == 1)
-		        doSoundAt(getFreeSource(),TELEPORTER,AL_FALSE,
-                          x, 0, z);
-                
-#endif
-
 		  if (temptree->deathCount >= 20)
 		  {    
                 temptree->intact = 0;
-#ifdef SOUND
-		        doSoundAt(getFreeSource(),CRASH, AL_FALSE,
-                          x, 0, z);
-                
-#endif	    
            }	    
 		}
 
@@ -3214,11 +3046,6 @@ void updatetrees(struct tree * allTrees, int itsChristmas)
 	    
 		if (temptree->death2 == -1)
         {
-#ifdef SOUND
-
-            doSoundAt(getFreeSource(), EXPLOSION, AL_FALSE,
-                   x, 0, z);
-#endif
      
             buildingsToDestroy -= 1;
         
@@ -3240,11 +3067,6 @@ void updatetrees(struct tree * allTrees, int itsChristmas)
 	    
 	if (!(temptree->intact) && (((temptree->type == 1) && (temptree->treeshape != 3)) || (temptree->type == 0)))
     {
-#ifdef SOUND
-	    doSoundAt(  getFreeSource(), CRASH ,AL_FALSE,  
-                    x, 0, z);
-	    
-#endif
 	    dead = 1;
 	    
 	    /* every construction except the hero teleporter*/
@@ -3319,15 +3141,6 @@ void updateDeadMonster(float x, float z, struct monsterInfo * thaMonster)
     float Vplane;
     int i, j, k;
 
-#ifdef SOUND
-        /* if monster was alive and firing his beam */
-        if(!thaMonster->monsterIsDead && thaMonster->beamOn &&
-            ( thaMonster->monster ==  FLUTTER || thaMonster->monster == GOOGELON) )
-            {
-            stopSound(thaMonster->source);
-            thaMonster->beamOn = 0;
-            }
-#endif
     thaMonster->monsterIsDead = 1;
     
     
@@ -3353,9 +3166,6 @@ void updateDeadMonster(float x, float z, struct monsterInfo * thaMonster)
 	{
 	if (thaMonster->monster != VAPOUR)
 	    {
- #ifdef SOUND
-	    doSoundAt(thaMonster->source, CRASH, AL_FALSE,0, 0, 0);
- #endif
 	    }
 	    
 	if (thaMonster->monster == FLUTTER)
@@ -3506,11 +3316,6 @@ void updateTargets()
 				    
 		case TECHS:	    updateGun(temptarget->x, temptarget->z, thaMonster.headHorzRotate,
                     thaMonster.headVertRotate, mainCounter, &(temptarget->monster));
-#ifdef SOUND
-		            if(mainCounter%2)
-                        doSoundAt(getFreeSource(), TECHSHOOT,AL_FALSE,
-                        temptarget->x, 0, temptarget->z);
-#endif
 				    thaMonster.energyRemaining -= 0.09;
 				    break;
 				    
@@ -3691,11 +3496,6 @@ void updateTargets()
 				    
 		case TECHS:	    updateGun(temptarget->x, temptarget->z, thaMonster.headHorzRotate,
 					thaMonster.headVertRotate, mainCounter, &(temptarget->monster));
-#ifdef SOUND
-		            if(mainCounter%2)
-                        doSoundAt(getFreeSource(), TECHSHOOT,AL_FALSE,
-                                  temptarget->x, PLANEY, temptarget->z);
-#endif
 				    thaMonster.energyRemaining -= 0.09;
 				    break;
 				    
@@ -3768,14 +3568,6 @@ void updateBooms(struct boom * allBooms, struct tank * tanklist)
 	bboom = tempboom->next;
 	bboom->count += 1;
 	
-	/***********************/
-	/* make some noise     */
-	/***********************/
-#ifdef SOUND
-	if ((bboom->count == 2))
-	;
-	    //doSound(EXPLOSION,0);
-#endif
 	/**********************************/
 	/* check for another tank hit     */
 	/**********************************/
@@ -4001,51 +3793,9 @@ void updateTanks(struct tank * allTanks, float width, float height,
 
 		    ttank->x += ttank->xv;
 		    ttank->z += ttank->zv;
-#ifdef SOUND
-
-            /*updates the source position*/
-            //alSource3f( ttank->source, AL_POSITION, ttank->x,ttank->y,ttank->z);
-#endif
 		}
     }
   
-#ifdef SOUND
-    /* once the monster is dead removes the beam sound */
-    if ( ( nearestMonster->monsterIsDead == 1) || (ttank->rad > ttank->range) || (ttank->rad < ttank->minrange))
-	{
-         switch(tanktype)
-         {
-             case MECHAG:
-             case CHH:
-             case MASERTANK:
-             {
-                   if ( ttank->maserCount > 0)
-                   {
-                        ttank->maserCount = 0;
-                        
-                        /*stop the beam sound*/
-                        stopSound(ttank->source);
-                        ttank->source = 0;
-                   }
-             }
-             break;
-             
-             case HERO:
-             {
-                   if ( ttank->maserCount > 0 && ttank->subtype==1)
-                   {
-                        ttank->maserCount = 0;
-                        
-                        /*stop the beam sound*/
-                        stopSound(ttank->source);
-                        ttank->source = 0;
-                   }
-             }
-             break;
-         }
-	}
-#endif
-	
 	if ((!dead) && (nearestMonster->monsterIsDead != 1) && (ttank->rad <= ttank->range) && (ttank->rad >= ttank->minrange))
 	{
 	/**********************************/
@@ -4060,11 +3810,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		yv = ((height - bottom) * 0.5 + bottom - ttank->y) / 12;	    
 		zv = - (ttank->z-centerZ) / 12;
 
-#ifdef SOUND
-       doSoundAt(getFreeSource(),TANKFIRE, AL_FALSE,
-                 ttank->x, ttank->y, ttank->z );
-#endif
-	
 		addProjectile( ttank->x, ttank->y, ttank->z, PROJROCKET, 
 		    xv, yv, zv, accuracy*0.33, NULL);
 		
@@ -4076,16 +3821,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		ttank->maserCount = 10 + (rand() % 5);
 		ttank->count = firingDelay;
 
-#ifdef SOUND
-   
-            /*starts the beam sound*/
-            if(ttank->source == 0 )
-                ttank->source = getFreeSource();
-              
-            doSoundAt(ttank->source, TANKMASER, AL_TRUE,
-                      ttank->x, ttank->y, ttank->z);
-
-#endif
 		
 		}
 	    if ( ttank->maserCount > 0 )
@@ -4093,16 +3828,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		maserOn = 1;
 		ttank->maserCount -= 1;
 		
-#ifdef SOUND
-        /* turn off the beam when monster is alive */
-        if ( ttank->maserCount == 0)
-        {
-           /*stop the beam sound*/
-           stopSound(ttank->source);
-           ttank->source = 0;
-        }
-
-#endif		
 		
 		nearestMonster->energyRemaining -= 0.5;
 		}					
@@ -4120,10 +3845,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		yv = ((height - bottom) * 0.5 + bottom - ttank->y) / 12;	    
 		zv = - (ttank->z-centerZ) / 12;
 		
-#ifdef SOUND
-       doSoundAt(getFreeSource(),TANKFIRE, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif	
 		addProjectile( ttank->x, ttank->y, ttank->z, PROJROCKET, 
 		    xv, yv, zv, accuracy*0.5, NULL);
 		
@@ -4135,17 +3856,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		ttank->maserCount = 10 + (rand() % 5);
 		ttank->count = firingDelay;
 
-#ifdef SOUND
-    
-        
-         /*starts the beam sound*/
-         if(ttank->source == 0 )
-             ttank->source = getFreeSource();
-                 
-         doSoundAt(ttank->source, TANKMASER, AL_TRUE,
-                   ttank->x, ttank->y, ttank->z);
-        
-#endif
 		
 		}
 	    if ( ttank->maserCount > 0 )
@@ -4153,14 +3863,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		maserOn = 1;
 		ttank->maserCount -= 1;	
   	    	
-#ifdef SOUND
-        if(ttank->maserCount == 0)
-        {
-            /*stop the beam sound*/
-            stopSound(ttank->source);
-            ttank->source = 0;
-        }
-#endif
 		
 		nearestMonster->energyRemaining -= 0.5;
 		}			
@@ -4182,10 +3884,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	    xv = sin(ttank->theta) * Vplane;
 	    zv = cos(ttank->theta) * Vplane;
 	    
-#ifdef SOUND
-       doSoundAt(getFreeSource(),TANKFIRE, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif
 	    addProjectile( ttank->x, ttank->y + 0.15, ttank->z, PROJTANK, 
 		xv, Vplane, zv, accuracy, NULL);
 	    }
@@ -4197,10 +3895,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	if ((tanktype == AIRPLANE) && (mainCounter % 2))
 	    {	    
  
- #ifdef SOUND
-       doSoundAt(getFreeSource(),TANKFIRE, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif		
 	    addProjectile(ttank->x, ttank->y-0.1, ttank->z, PROJTANK,  0, 0, 0,  0, NULL);  
 	    }
 
@@ -4216,11 +3910,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	    yv = ((height - bottom) * 0.5 + bottom - ttank->y) / 15;	    
 	    zv = - (ttank->z-centerZ) / 15;
 	    
-#ifdef SOUND
-       doSoundAt(getFreeSource(),HELOROCKET, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif
-
 	    addProjectile(ttank->x, ttank->y-0.1, ttank->z, PROJROCKET, xv, yv, zv, accuracy * 0.75, NULL);  
 	    addProjectile(ttank->x, ttank->y-0.1, ttank->z, PROJROCKET, xv, yv, zv, accuracy * 0.75, NULL);  
 	    addProjectile(ttank->x, ttank->y-0.1, ttank->z, PROJROCKET, xv, yv, zv, accuracy * 0.75, NULL);  
@@ -4238,10 +3927,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	    xv = - (ttank->x-centerX) / 15;
 	    yv = ((height - bottom) * 0.5 + bottom - ttank->y) / 15;	    
 	    zv = - (ttank->z-centerZ) / 15;
-#ifdef SOUND
-       doSoundAt(getFreeSource(),HELOROCKET, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif
 	    addProjectile( ttank->x, ttank->y-0.15, ttank->z, PROJROCKET, 
 		xv, yv, zv, accuracy*2, NULL);
 	    }
@@ -4259,10 +3944,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	    xv = - (ttank->x-centerX) / 15;
 	    zv = - (ttank->z-centerZ) / 15;
 	    
-#ifdef SOUND
-       doSoundAt(getFreeSource(),HELOROCKET, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-#endif
 	    addProjectile( ttank->x, ttank->y+0.2, ttank->z, PROJROCKET, 
 		xv, yv, zv, accuracy*0.4, NULL);
 	    }
@@ -4277,19 +3958,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		{
 		ttank->maserCount = 40;
 
-#ifdef SOUND
-        if(ttank->subtype == 1)
-        { 
-            /*starts the beam sound*/
-            if(ttank->source == 0 )
-                ttank->source = getFreeSource();
-         
-             doSoundAt(ttank->source, TANKMASER, AL_TRUE,
-                  ttank->x, ttank->y, ttank->z);
-         }
-
-#endif			
-	
 		}
 
 	    if (ttank->maserCount > 0)
@@ -4298,15 +3966,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		if (ttank->maserCount == 0)
 		{
 		    ttank->count = firingDelay;
-#ifdef SOUND
-        if(ttank->subtype == 1)
-        {
-            /*stop  beam sound*/
-            stopSound(ttank->source);
-            ttank->source = 0;
-        }
-
-#endif	
 		
         }    	
 		if ((ttank->maserCount > 10) && (ttank->maserCount < 30) && (ttank->subtype == 1))
@@ -4339,14 +3998,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	 	    if ((ttank->count <= 0) && (ttank->maserCount <= 0) && ((rand() % 5) == 0))
 		    {
 		        ttank->maserCount = 20 + (rand() % 5);
- #ifdef SOUND
-         /*starts the beam sound*/
-         if(ttank->source == 0 )
-              ttank->source = getFreeSource();
-         
-         doSoundAt(ttank->source, TANKMASER, AL_TRUE,
-                  ttank->x, ttank->y, ttank->z);
-#endif	 
 		    }
 		}
 		
@@ -4358,11 +4009,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		    if (ttank->maserCount == 0)
 		    {
 		         ttank->count = firingDelay;
-#ifdef SOUND
-        /*stop the beam sound*/
-        stopSound(ttank->source);
-        ttank->source = 0;
-#endif	    
             }	
             nearestMonster->energyRemaining -= 0.3;
 		}
@@ -4390,10 +4036,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		case FIGHTER:
 		case HELO:	    addScore(tanktype, nearestMonster);
 		
- #ifdef SOUND
-        doSoundAt(getFreeSource(),EXPLOSION, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif
 				    break;
 				    
 		case MECHAG:	    addScore(PARTIALM, nearestMonster);
@@ -4413,19 +4055,6 @@ void updateTanks(struct tank * allTanks, float width, float height,
 	    
 	if (ttank->damage <= 0)
     {
- #ifdef SOUND
-        /* if it was firing his beam it is needed turn it off*/
-        if( (ttank->maserCount >0) && 
-               (ttank->type == MASERTANK ||
-                ttank->type == MECHAG    ||
-                ttank->type == CHH       ||
-                (ttank->type == HERO  && ttank->subtype ==1)
-                )  )
-        {
-                stopSound(ttank->source);
-                ttank->source = 0;
-        }        
- #endif
 	    addBoom(ttank->x, ttank->y, ttank->z, NULL);
 		
 	    killertank = temptank->next;
@@ -4444,33 +4073,9 @@ void updateTanks(struct tank * allTanks, float width, float height,
 		killertank->next = slag->next;
 		slag->next = killertank;
 		killertank->count = 1;
-#ifdef SOUND
-        switch (ttank->type)
-		{
-		case TANK:
-		case LAUNCHER:
-		case MASERTANK:
-		case AIRPLANE:
-		case FIGHTER:
-		case HELO:
-                    doSoundAt(getFreeSource(), SLAG, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-                    break;
-        case MECHAG:	    
-		case CHH:  
-		case HERO:
-                    doSoundAt(getFreeSource(), ELECTRIC, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
-                    break;
-        }
-#endif
 		}
 	    else
 		{
- #ifdef SOUND
-        doSoundAt(getFreeSource(),EXPLOSION, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif
 		free(killertank); 
 		} 
     }
@@ -4521,10 +4126,6 @@ void updateSlagTanks(struct tank * allSlags)
 	    {
 	    addBoom(ttank->x, PLANEY, ttank->z, NULL);
 	    dead = 1;
- #ifdef SOUND
-        doSoundAt(getFreeSource(),EXPLOSION, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif
 	    }
 
 	if (((ttank->type == HELO) || (ttank->type == CHH) || (ttank->type == AIRPLANE) || (ttank->type == FIGHTER)) && (ttank->y > PLANEY))
@@ -4540,10 +4141,6 @@ void updateSlagTanks(struct tank * allSlags)
 	    if (ttank->count > 5)
 	    {
 		     dead = 1;
-#ifdef SOUND
-         doSoundAt(getFreeSource(),CRASH, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif	   
         }
 	}    
 	    
@@ -4595,10 +4192,6 @@ void updateSlagTanks(struct tank * allSlags)
 	if ((ttank->type == HERO) && (ttank->count >= 40))
 	    {
 	    Vplane = sqrt(GRAVITY * 1.5) * 0.7071;
- #ifdef SOUND
-        doSoundAt(getFreeSource(),EXPLOSION, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif	    
 		for (i=-1;i<2;i++)
 		    for (j=-1;j<2;j++)
 			for (k=-1;k<2;k++)
@@ -4630,10 +4223,6 @@ void updateSlagTanks(struct tank * allSlags)
 	if ((ttank->type == MECHAG) && (ttank->count >= 40))
 	    {
 	    Vplane = sqrt(GRAVITY * 1.5) * 1.4;
-  #ifdef SOUND
-        doSoundAt(getFreeSource(),CRASH, AL_FALSE,
-                  ttank->x, ttank->y, ttank->z);
- #endif
 		for (i=-1;i<2;i++)
 		    for (j=-1;j<2;j++)
 			for (k=-1;k<2;k++)
@@ -4951,10 +4540,6 @@ void doUpdate()
 				break;
 				
 	    case TECHS:		updateGun(0, 0, Googelon.headHorzRotate, Googelon.headVertRotate, mainCounter, &Googelon);
-#ifdef SOUND
-	           if(mainCounter%2)
-                  doSound(Googelon.source, TECHSHOOT,AL_FALSE);
-#endif
 				Googelon.energyRemaining -= 0.09;
 				break;
 				
@@ -5009,15 +4594,6 @@ void doUpdate()
 	{
 
 	updateDeadMonster(0, 0, &Googelon);
-#ifdef SOUND
-
-    /* monster is dead... music sounds like that*/
-    if(Googelon.energyRemaining == 0  && Googelon.deadCount == 1 &&
-        mode != DEMOMODE)
-    {
-        playMusic(DEFEAT_MUSIC, AL_FALSE);
-    }
-#endif
 	}
   
     if (Googelon.monsterMoving)
@@ -6157,13 +5733,9 @@ void id()
               levelEndCount == 0)
           {
              levelEndCount = 80;
-             playMusic(SUCCESS_MUSIC, AL_FALSE);
              
              /* stops beam*/
              Googelon.beamOn = 0;
-#ifdef SOUND
-             stopSound(Googelon.source);
-#endif
           }
           
           /***************************************************/

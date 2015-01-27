@@ -13,7 +13,7 @@
 # (the program should compile with no warning messages - if you
 #  see a warning message please let me know about it)
 # ------------------------------------------------------------
-CC = cc
+CC = gcc
 
 
 
@@ -38,8 +38,8 @@ GLIB =  -lGL -lGLU -lglut
 #         ELSE COMMENT THEM OUT
 #
 # ------------------------------------------------------------
-AUDIOLIB = -lopenal
-AUDIODEF = -I/usr/include/AL -DSOUND 
+#AUDIOLIB = -lopenal
+#AUDIODEF = -I/usr/include/AL -DSOUND 
 
 # STEP 5: IF YOU WANT THE SPANISH VERSION UNCOMMENT NEXT LINE
 #         IF NO LANGUAGE DEFINED ENGLISH VERSION IS COMPILED
